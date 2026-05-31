@@ -2,15 +2,15 @@
 
 以 **React + Vite** 製作的單頁式作品集,透過 **GitHub Actions** 自動部署到 **GitHub Pages**。
 
-## ✨ 特色
+## 特色
 
-- 📂 **作品目錄**:資料集中於 [`src/data/projects.js`](src/data/projects.js),新增專案只要改一個檔案
-- 🏷️ **自動分類篩選**:依專案標籤自動產生篩選按鈕
-- 🌗 **深 / 淺色主題**:記憶使用者選擇,並尊重系統偏好
-- 📱 **響應式設計**:手機 / 平板 / 桌機皆適用
-- ⚡ **自動部署**:push 到 `main` 即由 GitHub Actions build & deploy
+- **作品目錄**:資料集中於 [`src/data/projects.js`](src/data/projects.js),新增專案只要改一個檔案
+- **自動分類篩選**:依專案標籤自動產生篩選按鈕
+- **深 / 淺色主題**:記憶使用者選擇,並尊重系統偏好
+- **響應式設計**:手機 / 平板 / 桌機皆適用
+- **自動部署**:push 到 `main` 即由 GitHub Actions build & deploy
 
-## 🗂️ 結構
+## 結構
 
 ```
 Portfolio/
@@ -41,7 +41,7 @@ npm run build    # 打包輸出到 dist/
 npm run preview  # 預覽打包結果
 ```
 
-## ✏️ 客製化
+## 客製化
 
 1. **個人資訊**:編輯 [`src/components/Hero.jsx`](src/components/Hero.jsx) 與 [`Navbar.jsx`](src/components/Navbar.jsx) 的姓名、職稱、社群連結。
 2. **作品**:編輯 [`src/data/projects.js`](src/data/projects.js),依範例新增物件。
@@ -50,7 +50,7 @@ npm run preview  # 預覽打包結果
 5. **履歷**:把 PDF 命名為 `public/resume.pdf`(Hero 的「下載履歷」就會生效)。
 6. **主題色**:改 [`src/index.css`](src/index.css) 最上方 `:root` 的 `--primary`。
 
-## 🚀 部署到 GitHub Pages
+## 部署到 GitHub Pages
 
 本專案已內含 [`deploy.yml`](.github/workflows/deploy.yml),只需:
 
