@@ -1,44 +1,69 @@
-// Vite 會把 base 前綴自動加到 import.meta.env.BASE_URL
-const avatar = `${import.meta.env.BASE_URL}avatar.svg`;
+import { i18n } from "../data/i18n.js";
 
-export default function Hero() {
+export default function Hero({ lang = "zh" }) {
+  const t = i18n[lang].hero;
+
   return (
-    <section className="hero" id="about">
-      <div className="container hero__inner">
-        <div className="hero__text reveal">
-          <p className="hero__eyebrow">你好,我是</p>
-          <h1 className="hero__name">王韋程</h1>
-          <p className="hero__role">軟體工程師 · 後端開發 · 數位分身</p>
-          <p className="hero__bio">
-            我是一名軟體工程師,從高中起投入程式開發,大學主修資訊工程。
-            自2022年畢業後累積四年實務經驗:專注於後端,負責系統資料流設計、
-            資料庫架構規劃、REST API 開發與專案伺服器維運,並透過每週的跨域研發
-            參與前端數位分身系統;近一年則轉向前端,專責數位分身系統的開發。
-            我習慣從資料與架構的角度思考問題,並樂於在前後端之間找到最合適的解法。
-          </p>
-          <div className="hero__actions">
-            <a href="#projects" className="btn btn--primary">查看作品</a>
+    <section className="hero hero--target" id="about">
+      {/* ✅ 修正：文字區固定在左側，不讓內容撐爆畫面 */}
+      <div className="hero-target__content reveal is-visible">
+        <p className="hero-target__eyebrow">{t.eyebrow}</p>
+
+        {/* ✅ 修正：大標只放姓名，避免中文職稱爆版 */}
+        <h1 className="hero-target__title">
+          <mark>{t.name}</mark>
+        </h1>
+
+        {/* ✅ 修正：職稱改成副標，小字呈現 */}
+        <p className="hero-target__role">{t.role}</p>
+
+        {/* ✅ 修正：自介保留，但限制高度，避免壓到底部 Nav */}
+        <p className="hero-target__bio">{t.bio}</p>
+
+        <div className="hero-target__links">
+          <a className="target-link color-yellow" href="#projects">
+            {t.viewProjects}
+          </a>
+
+          <a
+            className="target-link color-red"
+            href={`${import.meta.env.BASE_URL}resume.pdf`}
+            target="_blank"
+            rel="noopener"
+          >
+            {t.downloadResume}
+          </a>
+        </div>
+
+        <ul className="hero-target__socials">
+          <li>
             <a
-              href={`${import.meta.env.BASE_URL}resume.pdf`}
-              className="btn btn--ghost"
+              href="https://github.com/PenguinWarrior"
               target="_blank"
               rel="noopener"
             >
-              下載履歷
+              GitHub
             </a>
-          </div>
-          <ul className="hero__socials">
-            <li><a href="https://github.com/PenguinWarrior" target="_blank" rel="noopener">GitHub</a></li>
-            <li><a href="https://linkedin.com/in/your-id" target="_blank" rel="noopener">LinkedIn</a></li>
-            <li><a href="mailto:you@example.com">Email</a></li>
-          </ul>
-        </div>
-        <div className="hero__avatar reveal">
-          <div className="avatar-ring">
-            <img src={avatar} alt="王韋程 頭像" />
-          </div>
-        </div>
+          </li>
+          <li>
+            <a
+              href="https://linkedin.com/in/your-id"
+              target="_blank"
+              rel="noopener"
+            >
+              LinkedIn
+            </a>
+          </li>
+          <li>
+            <a href="mailto:you@example.com">Email</a>
+          </li>
+        </ul>
       </div>
+
+      {/* ✅ 修正：粒子人物固定在右側，不參與排版 */}
+      {/* <div className="hero-target__portrait">
+        <ParticlePortrait alt={t.avatarAlt} />
+      </div> */}
     </section>
   );
 }
