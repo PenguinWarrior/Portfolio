@@ -7,11 +7,14 @@ export default function Hero() {
       <div className="container hero__inner">
         <div className="hero__text reveal">
           <p className="hero__eyebrow">你好,我是</p>
-          <h1 className="hero__name">Your Name</h1>
-          <p className="hero__role">前端工程師 · UI 設計 · 全端開發</p>
+          <h1 className="hero__name">王韋程</h1>
+          <p className="hero__role">軟體工程師 · 後端開發 · 數位分身</p>
           <p className="hero__bio">
-            這裡是一段簡短的自我介紹。說明你的專長、熱情所在,以及你想解決的問題。
-            保持兩到三句、清楚有力即可。
+            我是一名軟體工程師,從高中起投入程式開發,大學主修資訊工程。
+            自2022年畢業後累積四年實務經驗:專注於後端,負責系統資料流設計、
+            資料庫架構規劃、REST API 開發與專案伺服器維運,並透過每週的跨域研發
+            參與前端數位分身系統;近一年則轉向前端,專責數位分身系統的開發。
+            我習慣從資料與架構的角度思考問題,並樂於在前後端之間找到最合適的解法。
           </p>
           <div className="hero__actions">
             <a href="#projects" className="btn btn--primary">查看作品</a>
@@ -32,7 +35,7 @@ export default function Hero() {
         </div>
         <div className="hero__avatar reveal">
           <div className="avatar-ring">
-            <img src={avatar} alt="Your Name 頭像" />
+            <img src={avatar} alt="王韋程 頭像" />
           </div>
         </div>
       </div>

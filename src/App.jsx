@@ -3,6 +3,7 @@ import Navbar from "./components/Navbar.jsx";
 import Hero from "./components/Hero.jsx";
 import Projects from "./components/Projects.jsx";
 import Skills from "./components/Skills.jsx";
+import Experience from "./components/Experience.jsx";
 import Footer from "./components/Footer.jsx";
 import useReveal from "./hooks/useReveal.js";
 
@@ -27,6 +28,7 @@ export default function App() {
         <Hero />
         <Projects />
         <Skills />
+        <Experience />
       </main>
       <Footer />
     </>

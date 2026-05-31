@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 const LINKS = [
   { href: "#projects", label: "作品" },
   { href: "#skills", label: "技能" },
-  { href: "#contact", label: "聯絡" },
+  { href: "#experience", label: "經歷" },
 ];
 
 export default function Navbar() {
@@ -23,7 +23,7 @@ export default function Navbar() {
     <header className="site-header" id="top">
       <nav className="nav container">
         <a href="#top" className="nav__brand" onClick={() => setOpen(false)}>
-          YN<span>.</span>
+          韋程<span>.</span>
         </a>
 
         <button
