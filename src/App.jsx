@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import Navbar from "./components/Navbar.jsx";
+import Intro from "./components/Intro.jsx";
 import Hero from "./components/Hero.jsx";
 import Projects from "./components/Projects.jsx";
 import Skills from "./components/Skills.jsx";
@@ -24,6 +25,7 @@ export default function App() {
   return (
     <>
       <Navbar />
+      <Intro />
       <main>
         <Hero />
         <Projects />

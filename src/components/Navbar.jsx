@@ -8,6 +8,7 @@ const LINKS = [
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
+  const [hidden, setHidden] = useState(true); // 一開始在封面上,先隱藏
   const [theme, setTheme] = useState(
     () => document.documentElement.getAttribute("data-theme") || "light"
   );
@@ -17,10 +18,18 @@ export default function Navbar() {
     localStorage.setItem("theme", theme);
   }, [theme]);
 
+  // 捲過第一屏(PORTFOLIO 封面)後才顯示導覽列
+  useEffect(() => {
+    const onScroll = () => setHidden(window.scrollY < window.innerHeight * 0.6);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
   const toggleTheme = () => setTheme((t) => (t === "dark" ? "light" : "dark"));
 
   return (
-    <header className="site-header" id="top">
+    <header className={`site-header${hidden ? " site-header--hidden" : ""}`} id="top">
       <nav className="nav container">
         <a href="#top" className="nav__brand" onClick={() => setOpen(false)}>
           韋程<span>.</span>
