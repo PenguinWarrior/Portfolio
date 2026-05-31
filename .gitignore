@@ -1,0 +1,46 @@
+# ===== 相依套件 =====
+node_modules/
+
+# ===== 建置輸出(由 GitHub Actions 自動 build,不需進版控)=====
+dist/
+dist-ssr/
+
+# ===== 環境變數 =====
+.env
+.env.*
+!.env.example
+
+# ===== 日誌 / 除錯 =====
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+logs/
+
+# ===== 快取 =====
+.vite/
+.cache/
+*.tsbuildinfo
+.eslintcache
+
+# ===== 編輯器 / IDE =====
+.vscode/*
+!.vscode/extensions.json
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# ===== Claude Code 本機設定 =====
+.claude/settings.local.json
+
+# ===== 作業系統雜檔 =====
+.DS_Store
+Thumbs.db
+
+# ===== 本機暫存(本專案開發過程產生)=====
+_verify.txt
+_envcheck.txt
