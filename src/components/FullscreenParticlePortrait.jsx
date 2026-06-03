@@ -17,15 +17,13 @@ export default function FullscreenParticlePortrait() {
     let animationId;
     let mounted = true;
 
-    // ✅ 新增：全版拖曳狀態，模擬參考網站拖曳 camera 的感覺
+    // ✅ 新增：全版拖曳狀態，用於計算局部粒子拉扯
     const drag = {
       isDown: false,
       lastX: 0,
       lastY: 0,
-      offsetX: 0,
-      offsetY: 0,
-      targetX: 0,
-      targetY: 0,
+      moveX: 0,
+      moveY: 0,
     };
 
     const pointer = {
@@ -112,6 +110,8 @@ export default function FullscreenParticlePortrait() {
               tx: baseX + x - portrait.width / 2,
               ty: baseY + y - portrait.height / 2,
 
+              vx: 0,
+              vy: 0,
               size: Math.random() * 1.2 + 0.45,
               color: `rgba(${r}, ${g}, ${b}, ${(alpha / 255) * getThemeDim()})`,
             });
@@ -123,47 +123,42 @@ export default function FullscreenParticlePortrait() {
     const animate = () => {
       ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
 
-      // ✅ 放開後回彈，對應參考網站 camera 回中心
-      if (!drag.isDown) {
-        drag.targetX = 0;
-        drag.targetY = 0;
-      }
-
-      drag.offsetX += (drag.targetX - drag.offsetX) * 0.07;
-      drag.offsetY += (drag.targetY - drag.offsetY) * 0.07;
+      const isDragging = drag.isDown;
 
       particles.forEach((p) => {
-        // ✅ 粒子慢慢聚合到人物位置
-        p.x += (p.tx - p.x) * 0.04;
-        p.y += (p.ty - p.y) * 0.04;
-
-        // ✅ 靠近滑鼠時微微浮動，增加互動感
-        let mousePushX = 0;
-        let mousePushY = 0;
-
-        if (pointer.x !== undefined && pointer.y !== undefined) {
+        // ✅ 若正在拖曳，對附近粒子施加拉扯力
+        if (isDragging && pointer.x !== undefined && pointer.y !== undefined) {
           const dx = pointer.x - p.x;
           const dy = pointer.y - p.y;
           const distance = Math.sqrt(dx * dx + dy * dy);
+          const radius = 160;
 
-          if (distance < 70) {
-            const force = (70 - distance) / 70;
-            mousePushX = -dx * force * 0.08;
-            mousePushY = -dy * force * 0.08;
+          if (distance < radius) {
+            const strength = (radius - distance) / radius;
+            p.vx += drag.moveX * strength * 0.055;
+            p.vy += drag.moveY * strength * 0.055;
           }
         }
 
+        // ✅ 粒子回到其原始目標位置，形成彈性回彈感
+        p.vx += (p.tx - p.x) * 0.0022;
+        p.vy += (p.ty - p.y) * 0.0022;
+
+        p.vx *= 0.88;
+        p.vy *= 0.88;
+
+        p.x += p.vx;
+        p.y += p.vy;
+
         ctx.beginPath();
-        ctx.arc(
-          p.x + drag.offsetX + mousePushX,
-          p.y + drag.offsetY + mousePushY,
-          p.size,
-          0,
-          Math.PI * 2,
-        );
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
         ctx.fillStyle = p.color;
         ctx.fill();
       });
+
+      // ✅ 拖曳移動量逐漸衰減，避免拖曳停止後持續作用
+      drag.moveX *= 0.2;
+      drag.moveY *= 0.2;
 
       animationId = requestAnimationFrame(animate);
     };
@@ -182,7 +177,10 @@ export default function FullscreenParticlePortrait() {
       drag.isDown = true;
       drag.lastX = event.clientX;
       drag.lastY = event.clientY;
-      canvas.setPointerCapture?.(event.pointerId);
+      pointer.x = event.clientX;
+      pointer.y = event.clientY;
+      drag.moveX = 0;
+      drag.moveY = 0;
     };
 
     const handlePointerMove = (event) => {
@@ -196,15 +194,16 @@ export default function FullscreenParticlePortrait() {
 
       drag.lastX = event.clientX;
       drag.lastY = event.clientY;
-
-      // ✅ 模擬參考網站拖曳 camera，整個人物粒子層偏移
-      drag.targetX = Math.max(-90, Math.min(90, drag.targetX + dx * 0.35));
-      drag.targetY = Math.max(-70, Math.min(70, drag.targetY + dy * 0.35));
+      drag.moveX = dx * 0.95;
+      drag.moveY = dy * 0.95;
     };
 
+    drag.moveX = 0;
+    drag.moveY = 0;
     const handlePointerUp = (event) => {
       drag.isDown = false;
-      canvas.releasePointerCapture?.(event.pointerId);
+      pointer.x = undefined;
+      pointer.y = undefined;
     };
 
     const handleResize = () => {
@@ -215,10 +214,10 @@ export default function FullscreenParticlePortrait() {
       buildParticles();
     };
 
-    canvas.addEventListener("pointerdown", handlePointerDown);
-    canvas.addEventListener("pointermove", handlePointerMove);
-    canvas.addEventListener("pointerup", handlePointerUp);
-    canvas.addEventListener("pointerleave", handlePointerUp);
+    window.addEventListener("pointerdown", handlePointerDown);
+    window.addEventListener("pointermove", handlePointerMove);
+    window.addEventListener("pointerup", handlePointerUp);
+    window.addEventListener("pointercancel", handlePointerUp);
     window.addEventListener("resize", handleResize);
 
     const observer = new MutationObserver(handleThemeChange);
@@ -231,10 +230,10 @@ export default function FullscreenParticlePortrait() {
       mounted = false;
       cancelAnimationFrame(animationId);
 
-      canvas.removeEventListener("pointerdown", handlePointerDown);
-      canvas.removeEventListener("pointermove", handlePointerMove);
-      canvas.removeEventListener("pointerup", handlePointerUp);
-      canvas.removeEventListener("pointerleave", handlePointerUp);
+      window.removeEventListener("pointerdown", handlePointerDown);
+      window.removeEventListener("pointermove", handlePointerMove);
+      window.removeEventListener("pointerup", handlePointerUp);
+      window.removeEventListener("pointercancel", handlePointerUp);
       window.removeEventListener("resize", handleResize);
       observer.disconnect();
     };

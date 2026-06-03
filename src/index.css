@@ -313,7 +313,7 @@ ul {
 /* ===== 作品卡片 ===== */
 .projects-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: 24px;
 }
 .card {
@@ -2348,10 +2348,13 @@ body::before {
    4. 版型更接近參考圖一
    ============================================================ */
 
-/* ✅ 修正：整頁固定 100vh，禁止內容撐出畫面 */
+/* ✅ 修正：整頁固定 100vh，允許頁內垂直滾動 */
 .page-panel {
+  min-height: 100vh !important;
   height: 100vh !important;
-  overflow: hidden !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  overscroll-behavior-y: contain !important;
   padding-bottom: 0 !important;
 }
 
@@ -2596,6 +2599,95 @@ body::before {
     gap: 18px;
   }
 }
+
+@media (max-width: 760px) {
+  .page-shell {
+    height: 100vh;
+  }
+
+  .page-panel {
+    overflow-y: auto !important;
+    padding-bottom: 16px !important;
+  }
+
+  .hero-target__content {
+    left: 18px;
+    top: 20%;
+    width: calc(100vw - 36px);
+  }
+
+  .hero-target__title {
+    font-size: clamp(2.8rem, 16vw, 4.6rem);
+  }
+
+  .hero-target__role {
+    max-width: 100%;
+    font-size: 1rem;
+  }
+
+  .hero-target__bio {
+    max-width: 100%;
+    max-height: 6.5em;
+    font-size: 0.86rem;
+    line-height: 1.7;
+  }
+
+  .hero-target__portrait {
+    right: -80px;
+    width: min(320px, 72vw);
+    height: min(360px, 72vw);
+    opacity: 0.24;
+  }
+
+  .hero-target__dots {
+    top: 20px;
+    left: 18px;
+  }
+
+  .hero-target__socials {
+    gap: 14px;
+  }
+
+  .page-shell__dots {
+    left: 18px;
+    top: 20px;
+  }
+
+  .bottom-nav {
+    bottom: 16px !important;
+    width: calc(100vw - 32px) !important;
+  }
+
+  .bottom-nav__list {
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .contact-dock,
+  .bottom-nav__actions {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .projects-grid,
+  .skills {
+    gap: 18px;
+  }
+
+  .timeline {
+    max-width: 100%;
+    padding-left: 18px;
+  }
+
+  .timeline::before {
+    left: 10px;
+  }
+
+  .timeline__item::before {
+    left: -18px;
+  }
+}
+
 /* ============================================================
    ✅ Step 8 重構：全版人物粒子 canvas
    目的：接近參考網站 #yahia 的做法：
