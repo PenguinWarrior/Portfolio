@@ -6,6 +6,7 @@ import Projects from "./components/Projects.jsx";
 import Skills from "./components/Skills.jsx";
 import Experience from "./components/Experience.jsx";
 import Footer from "./components/Footer.jsx";
+import HyperOverlay from "./components/HyperOverlay.jsx";
 import useReveal from "./hooks/useReveal.js";
 
 export default function App() {
@@ -18,12 +19,13 @@ export default function App() {
     const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
     document.documentElement.setAttribute(
       "data-theme",
-      saved || (prefersDark ? "dark" : "light")
+      saved || "dark"
     );
   }, []);
 
   return (
     <>
+      <HyperOverlay />
       <Navbar />
       <Intro />
       <main>
