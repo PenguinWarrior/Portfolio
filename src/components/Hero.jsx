@@ -18,9 +18,9 @@ function Hero() {
         <p className="cover__role">軟體工程師 · 後端開發 · 數位分身</p>
 
         <p className="cover__bio">
-          從高中起投入程式開發,大學主修資訊工程。四年實務經驗橫跨後端與前端 ——
+          從高中起投入程式開發，大學主修資訊工程。四年實務經驗橫跨後端與前端 ——
           系統資料流設計、資料庫架構、REST
-          API、伺服器維運,以及數位分身系統開發。
+          API、伺服器維運，以及數位分身系統開發。
         </p>
 
         <ul className="cover__chips">
