@@ -1,4 +1,4 @@
-import { memo, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Intro from "./components/Intro.jsx";
 import Hero from "./components/Hero.jsx";
 import Projects from "./components/Projects.jsx";
@@ -25,56 +25,12 @@ const CONTACT_LINKS = [
 ];
 
 const PAGES = [
-  { key: "cover", label: "封面", Component: Intro },
-  { key: "about", label: "ABOUT", Component: Hero },
-  { key: "projects", label: "作品目錄", Component: Projects },
-  { key: "skills", label: "技能", Component: Skills },
-  { key: "experience", label: "經歷", Component: Experience },
+  { key: "cover", label: "封面", node: <Intro /> },
+  { key: "about", label: "關於我", node: <Hero /> },
+  { key: "projects", label: "作品目錄", node: <Projects /> },
+  { key: "skills", label: "技能", node: <Skills /> },
+  { key: "experience", label: "經歷", node: <Experience /> },
 ];
-
-const PageSection = memo(
-  function PageSection({ page, index, active }) {
-    const isActive = index === active;
-    const state = isActive ? "active" : index < active ? "past" : "future";
-
-    return (
-      <section
-        className={`snap-panel snap-panel--${page.key}${isActive ? " is-active" : ""}`}
-        data-state={state}
-        style={{ "--section-index": index }}
-        id={page.key}
-        aria-hidden={!isActive}
-      >
-        <div className="snap-panel__tag">
-          <span>{String(index + 1).padStart(2, "0")}</span>
-          <b>{page.label}</b>
-        </div>
-        <div className="snap-panel__inner">
-          <page.Component />
-        </div>
-      </section>
-    );
-  },
-  (prev, next) => {
-    const prevState =
-      prev.index === prev.active
-        ? "active"
-        : prev.index < prev.active
-          ? "past"
-          : "future";
-    const nextState =
-      next.index === next.active
-        ? "active"
-        : next.index < next.active
-          ? "past"
-          : "future";
-    return (
-      prev.page === next.page &&
-      prev.index === next.index &&
-      prevState === nextState
-    );
-  },
-);
 
 export default function App() {
   const [active, setActive] = useState(0);
@@ -82,6 +38,7 @@ export default function App() {
   const [theme, setTheme] = useState(
     () => localStorage.getItem("theme") || "dark",
   );
+  const panelInnerRefs = useRef([]);
 
   const pageCount = PAGES.length;
   const progress = useMemo(
@@ -122,6 +79,22 @@ export default function App() {
       }, 780);
     };
 
+    const canScrollInsideActivePanel = (deltaY) => {
+      const panel = panelInnerRefs.current[active];
+      if (!panel) return false;
+
+      const hasOverflow = panel.scrollHeight > panel.clientHeight + 4;
+      if (!hasOverflow) return false;
+
+      const atTop = panel.scrollTop <= 2;
+      const atBottom =
+        panel.scrollTop + panel.clientHeight >= panel.scrollHeight - 2;
+
+      if (deltaY > 0) return !atBottom;
+      if (deltaY < 0) return !atTop;
+      return false;
+    };
+
     const goNext = () => {
       if (contactOpen) return;
       setActive((current) => {
@@ -142,8 +115,13 @@ export default function App() {
     };
 
     const onWheel = (event) => {
+      if (Math.abs(event.deltaY) < 18) return;
+
+      // 目前頁面還有內容可以捲時，先讓該頁內容自然滾動；到頂/到底後才換頁。
+      if (!contactOpen && canScrollInsideActivePanel(event.deltaY)) return;
+
       event.preventDefault();
-      if (locked || Math.abs(event.deltaY) < 18) return;
+      if (locked) return;
       locked = true;
       event.deltaY > 0 ? goNext() : goPrev();
       unlock();
@@ -156,6 +134,9 @@ export default function App() {
         ![...nextKeys, ...prevKeys, "Escape", "Home", "End"].includes(event.key)
       )
         return;
+
+      const direction = nextKeys.includes(event.key) ? 1 : -1;
+      if (!contactOpen && canScrollInsideActivePanel(direction)) return;
 
       event.preventDefault();
       if (event.key === "Escape") return setContactOpen(false);
@@ -179,7 +160,7 @@ export default function App() {
       window.removeEventListener("wheel", onWheel);
       window.removeEventListener("keydown", onKeyDown);
     };
-  }, [contactOpen, pageCount]);
+  }, [active, contactOpen, pageCount]);
 
   useEffect(() => {
     document.documentElement.style.setProperty("--page-index", active);
@@ -231,12 +212,30 @@ export default function App() {
 
       <main className="fp-stage">
         {PAGES.map((page, index) => (
-          <PageSection
+          <section
             key={page.key}
-            page={page}
-            index={index}
-            active={active}
-          />
+            className={`snap-panel snap-panel--${page.key}${index === active ? " is-active" : ""}`}
+            data-state={
+              index === active ? "active" : index < active ? "past" : "future"
+            }
+            style={{ "--panel-distance": Math.abs(index - active) }}
+            id={page.key}
+            aria-hidden={index !== active}
+          >
+            <div className="snap-panel__tag">
+              <span>{String(index + 1).padStart(2, "0")}</span>
+              <b>{page.label}</b>
+            </div>
+            <div
+              className="snap-panel__inner"
+              ref={(el) => {
+                panelInnerRefs.current[index] = el;
+              }}
+              tabIndex={index === active ? 0 : -1}
+            >
+              {page.node}
+            </div>
+          </section>
         ))}
       </main>
 
@@ -269,9 +268,8 @@ export default function App() {
           </button>
           <p className="contact-modal__eyebrow">FINAL NODE // CONTACT</p>
           <h2>聯絡我</h2>
-          <p className="contact-modal__desc">
-            滾動到最後一頁後，再往下滾動即可開啟此視窗。請把下方連結換成你的實際資訊。
-          </p>
+          <br />
+          <p className="contact-modal__desc"> </p>
           <div className="contact-links">
             {CONTACT_LINKS.map((link) => (
               <a

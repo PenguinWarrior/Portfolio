@@ -7,7 +7,8 @@ function Experience() {
       <div className="container">
         <header className="section__head reveal">
           <h2 className="section__title">經歷</h2>
-          <p className="section__subtitle">工作與學習的時間軸。</p>
+          {/* <p className="section__subtitle">工作與學習的時間軸。</p> */}
+          <p className="section__subtitle"></p>
         </header>
 
         <ol className="timeline">

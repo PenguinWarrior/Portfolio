@@ -28,7 +28,9 @@ function Projects() {
       <div className="container">
         <header className="section__head reveal">
           <h2 className="section__title">作品目錄</h2>
-          <p className="section__subtitle">依技能分類,點擊上方按鈕篩選。</p>
+          <p className="section__subtitle">
+            以專案類型整理過往開發與系統實作經驗，呈現介面、資料流與功能設計能力。
+          </p>
         </header>
 
         <div className="filters" role="tablist" aria-label="作品分類">

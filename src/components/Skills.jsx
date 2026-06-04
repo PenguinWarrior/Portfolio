@@ -7,7 +7,8 @@ function Skills() {
       <div className="container">
         <header className="section__head reveal">
           <h2 className="section__title">技能</h2>
-          <p className="section__subtitle">我常用的工具與技術。</p>
+          {/* <p className="section__subtitle">我常用的工具與技術。</p> */}
+          <p className="section__subtitle"></p>
         </header>
 
         <div className="skills">
