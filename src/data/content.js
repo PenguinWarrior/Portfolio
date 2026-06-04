@@ -74,15 +74,15 @@ export const content = {
   skills: {
     title: { zh: "技能", en: "Skills" },
     subtitle: {
-      zh: "我常用的工具與技術。",
-      en: "My frequently used tools and technologies.",
+      zh: "　。",
+      en: "　",
     },
   },
   experience: {
     title: { zh: "經歷", en: "Experience" },
     subtitle: {
-      zh: "工作與學習的時間軸。",
-      en: "Career and learning timeline.",
+      zh: "　",
+      en: "　",
     },
   },
   contactModal: {
@@ -92,8 +92,8 @@ export const content = {
     eyebrow: { zh: "FINAL NODE // CONTACT", en: "FINAL NODE // CONTACT" },
     title: { zh: "聯絡我", en: "Contact me" },
     desc: {
-      zh: "滾動到最後一頁後，再往下捲動即可開啟此視窗。請把下方連結換成你的實際資訊。",
-      en: "Scroll to the end and continue to open this panel. Replace the links below with your real contact details.",
+      zh: "　",
+      en: "　",
     },
   },
   contactLinks: [

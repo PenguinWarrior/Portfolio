@@ -16,6 +16,9 @@ export default function App() {
   const [lang, setLang] = useState(() => localStorage.getItem("lang") || "zh");
   const panelInnerRefs = useRef([]);
 
+  const toggleTheme = () => setTheme((t) => (t === "dark" ? "light" : "dark"));
+  const toggleLang = () => setLang((l) => (l === "zh" ? "en" : "zh"));
+
   const pages = useMemo(
     () => [
       {
@@ -189,6 +192,10 @@ export default function App() {
         pages={pages}
         contactOpen={contactOpen}
         contactLabel={content.contactModal.title[lang]}
+        theme={theme}
+        lang={lang}
+        onToggleTheme={toggleTheme}
+        onToggleLang={toggleLang}
       />
 
       <header className="fp-nav" aria-label={content.nav.pageNavigation[lang]}>
@@ -219,20 +226,6 @@ export default function App() {
             </button>
           ))}
         </div>
-        <button
-          className="theme-toggle"
-          aria-label={content.nav.themeToggle[lang]}
-          onClick={() => setTheme((t) => (t === "dark" ? "light" : "dark"))}
-        >
-          {theme === "dark" ? "☀️" : "🌙"}
-        </button>
-        <button
-          className="theme-toggle"
-          aria-label={content.nav.langToggleAria[lang]}
-          onClick={() => setLang((l) => (l === "zh" ? "en" : "zh"))}
-        >
-          {content.nav.langToggle[lang]}
-        </button>
       </header>
 
       <main className="fp-stage">

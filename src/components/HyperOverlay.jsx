@@ -73,6 +73,10 @@ export default function HyperOverlay({
   pages = [],
   contactOpen = false,
   contactLabel = "",
+  theme = "dark",
+  lang = "zh",
+  onToggleTheme = () => {},
+  onToggleLang = () => {},
 }) {
   const activeRef = useRef(active);
   const contactOpenRef = useRef(contactOpen);
@@ -234,6 +238,24 @@ export default function HyperOverlay({
             {contactOpen ? "聯絡我" : pages[active]?.label || "PORTFOLIO"}
           </span>{" "}
           // DEPTH <strong ref={velocityRef}>0.00</strong>
+        </div>
+        <div className="hud-actions">
+          <button
+            type="button"
+            className="hud-action hud-action--theme"
+            aria-label="切換主題"
+            onClick={onToggleTheme}
+          >
+            {theme === "dark" ? "☀️" : "🌙"}
+          </button>
+          <button
+            type="button"
+            className="hud-action hud-action--lang"
+            aria-label="切換語言"
+            onClick={onToggleLang}
+          >
+            {lang === "zh" ? "EN" : "中"}
+          </button>
         </div>
         <div className="hud-bottom">
           <span>
