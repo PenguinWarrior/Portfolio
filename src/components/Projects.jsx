@@ -1,9 +1,9 @@
-import { useMemo, useState } from "react";
+import { memo, useMemo, useState } from "react";
 import { projects } from "../data/projects.js";
 import { skillGroups } from "../data/skills.js";
 import ProjectCard from "./ProjectCard.jsx";
 
-export default function Projects() {
+function Projects() {
   const [filter, setFilter] = useState("全部");
 
   // 分類依據 skills.js 的技能群組名稱,只列出實際有作品的群組
@@ -20,7 +20,7 @@ export default function Projects() {
       filter === "全部"
         ? projects
         : projects.filter((p) => p.category === filter),
-    [filter]
+    [filter],
   );
 
   return (
@@ -53,3 +53,5 @@ export default function Projects() {
     </section>
   );
 }
+
+export default memo(Projects);

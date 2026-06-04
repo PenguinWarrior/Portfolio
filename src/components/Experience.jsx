@@ -1,6 +1,7 @@
+import { memo } from "react";
 import { experiences } from "../data/experience.js";
 
-export default function Experience() {
+function Experience() {
   return (
     <section className="section" id="experience">
       <div className="container">
@@ -29,3 +30,5 @@ export default function Experience() {
     </section>
   );
 }
+
+export default memo(Experience);

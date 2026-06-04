@@ -1,4 +1,6 @@
-export default function Hero() {
+import { memo } from "react";
+
+function Hero() {
   return (
     <section className="cover" id="about">
       {/* 背景裝飾,純視覺 */}
@@ -9,7 +11,7 @@ export default function Hero() {
       </div>
 
       <div className="container cover__inner reveal">
-        <div className="cover__badge">韋程</div>
+        <div className="cover__badge">WAYNE</div>
 
         <p className="cover__eyebrow">PORTFOLIO · 作品集</p>
         <h1 className="cover__name">王韋程</h1>
@@ -17,7 +19,8 @@ export default function Hero() {
 
         <p className="cover__bio">
           從高中起投入程式開發,大學主修資訊工程。四年實務經驗橫跨後端與前端 ——
-          系統資料流設計、資料庫架構、REST API、伺服器維運,以及數位分身系統開發。
+          系統資料流設計、資料庫架構、REST
+          API、伺服器維運,以及數位分身系統開發。
         </p>
 
         <ul className="cover__chips">
@@ -29,7 +32,9 @@ export default function Hero() {
         </ul>
 
         <div className="cover__actions">
-          <a href="#projects" className="btn btn--primary">查看作品</a>
+          <a href="#projects" className="btn btn--primary">
+            查看作品
+          </a>
           <a
             href={`${import.meta.env.BASE_URL}resume.pdf`}
             className="btn btn--ghost"
@@ -47,3 +52,5 @@ export default function Hero() {
     </section>
   );
 }
+
+export default memo(Hero);

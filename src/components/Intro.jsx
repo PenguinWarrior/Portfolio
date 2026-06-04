@@ -1,4 +1,6 @@
-export default function Intro() {
+import { memo } from "react";
+
+function Intro() {
   return (
     <section className="intro" id="intro">
       <div className="intro__bg" aria-hidden="true">
@@ -14,3 +16,5 @@ export default function Intro() {
     </section>
   );
 }
+
+export default memo(Intro);

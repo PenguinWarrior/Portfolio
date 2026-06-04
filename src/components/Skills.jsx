@@ -1,6 +1,7 @@
+import { memo } from "react";
 import { skillGroups } from "../data/skills.js";
 
-export default function Skills() {
+function Skills() {
   return (
     <section className="section section--alt" id="skills">
       <div className="container">
@@ -25,3 +26,5 @@ export default function Skills() {
     </section>
   );
 }
+
+export default memo(Skills);

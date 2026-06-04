@@ -1,4 +1,6 @@
-export default function ProjectCard({ project }) {
+import { memo } from "react";
+
+function ProjectCard({ project }) {
   const { title, description, image, tags = [], demo, code } = project;
   const initial = (title || "?").trim().charAt(0).toUpperCase();
 
@@ -22,10 +24,14 @@ export default function ProjectCard({ project }) {
         {(demo || code) && (
           <div className="card__links">
             {demo && (
-              <a href={demo} target="_blank" rel="noopener">線上預覽 ↗</a>
+              <a href={demo} target="_blank" rel="noopener">
+                線上預覽 ↗
+              </a>
             )}
             {code && (
-              <a href={code} target="_blank" rel="noopener">原始碼 ↗</a>
+              <a href={code} target="_blank" rel="noopener">
+                原始碼 ↗
+              </a>
             )}
           </div>
         )}
@@ -33,3 +39,5 @@ export default function ProjectCard({ project }) {
     </article>
   );
 }
+
+export default memo(ProjectCard);
