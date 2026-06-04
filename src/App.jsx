@@ -15,9 +15,79 @@ export default function App() {
   );
   const [lang, setLang] = useState(() => localStorage.getItem("lang") || "zh");
   const panelInnerRefs = useRef([]);
+  const audioCtxRef = useRef(null);
+  const lastHoverButtonRef = useRef(null);
 
   const toggleTheme = () => setTheme((t) => (t === "dark" ? "light" : "dark"));
   const toggleLang = () => setLang((l) => (l === "zh" ? "en" : "zh"));
+
+  const getAudioContext = () => {
+    if (audioCtxRef.current) return audioCtxRef.current;
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContext) return null;
+    audioCtxRef.current = new AudioContext();
+    return audioCtxRef.current;
+  };
+
+  const playSound = ({ type, setupFrequency, duration = 0.25 }) => {
+    const audioCtx = getAudioContext();
+    if (!audioCtx) return;
+    if (audioCtx.state === "suspended") audioCtx.resume();
+
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = type;
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+
+    const now = audioCtx.currentTime;
+    gain.gain.setValueAtTime(0.0001, now);
+    gain.gain.exponentialRampToValueAtTime(0.12, now + 0.01);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+
+    setupFrequency(now, osc.frequency);
+
+    osc.start(now);
+    osc.stop(now + duration + 0.02);
+  };
+
+  const playScrollSound = (direction) => {
+    if (direction > 0) {
+      playSound({
+        type: "sine",
+        duration: 0.25,
+        setupFrequency: (now, frequency) => {
+          frequency.setValueAtTime(500, now);
+          frequency.exponentialRampToValueAtTime(90, now + 0.25);
+        },
+      });
+    } else {
+      playSound({
+        // type: "sawtooth",
+        // duration: 0.3,
+        // setupFrequency: (now, frequency) => {
+        //   frequency.setValueAtTime(140, now);
+        //   frequency.exponentialRampToValueAtTime(800, now + 0.3);
+        type: "sine",
+        duration: 0.06,
+        setupFrequency: (now, frequency) => {
+          frequency.setValueAtTime(780, now);
+          frequency.setValueAtTime(1180, now + 0.03);
+        },
+      });
+    }
+  };
+
+  const playButtonHoverSound = () => {
+    playSound({
+      type: "sine",
+      duration: 0.08,
+      setupFrequency: (now, frequency) => {
+        frequency.setValueAtTime(900, now);
+        frequency.setValueAtTime(1400, now + 0.04);
+      },
+    });
+  };
 
   const pages = useMemo(
     () => [
@@ -138,6 +208,7 @@ export default function App() {
       event.preventDefault();
       if (locked) return;
       locked = true;
+      playScrollSound(event.deltaY > 0 ? 1 : -1);
       event.deltaY > 0 ? goNext() : goPrev();
       unlock();
     };
@@ -176,6 +247,29 @@ export default function App() {
       window.removeEventListener("keydown", onKeyDown);
     };
   }, [active, contactOpen, pageCount]);
+
+  useEffect(() => {
+    const onPointerOver = (event) => {
+      const button = event.target.closest("button");
+      if (!button || button === lastHoverButtonRef.current) return;
+      lastHoverButtonRef.current = button;
+      playButtonHoverSound();
+    };
+
+    const onPointerOut = (event) => {
+      const button = event.target.closest("button");
+      if (button && button === lastHoverButtonRef.current) {
+        lastHoverButtonRef.current = null;
+      }
+    };
+
+    document.addEventListener("pointerover", onPointerOver);
+    document.addEventListener("pointerout", onPointerOut);
+    return () => {
+      document.removeEventListener("pointerover", onPointerOver);
+      document.removeEventListener("pointerout", onPointerOut);
+    };
+  }, []);
 
   useEffect(() => {
     document.documentElement.style.setProperty("--page-index", active);
