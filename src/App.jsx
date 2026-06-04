@@ -202,8 +202,14 @@ export default function App() {
     const onWheel = (event) => {
       if (Math.abs(event.deltaY) < 18) return;
 
-      // 目前頁面還有內容可以捲時，先讓該頁內容自然滾動；到頂/到底後才換頁。
-      if (!contactOpen && canScrollInsideActivePanel(event.deltaY)) return;
+      const panel = panelInnerRefs.current[active];
+      const canScroll =
+        !contactOpen && canScrollInsideActivePanel(event.deltaY);
+      if (canScroll && panel) {
+        event.preventDefault();
+        panel.scrollBy({ top: event.deltaY, left: 0, behavior: "auto" });
+        return;
+      }
 
       event.preventDefault();
       if (locked) return;
@@ -240,10 +246,18 @@ export default function App() {
       unlock();
     };
 
-    window.addEventListener("wheel", onWheel, { passive: false });
+    document.addEventListener("wheel", onWheel, {
+      passive: false,
+      capture: true,
+    });
+    window.addEventListener("wheel", onWheel, {
+      passive: false,
+      capture: true,
+    });
     window.addEventListener("keydown", onKeyDown);
     return () => {
-      window.removeEventListener("wheel", onWheel);
+      document.removeEventListener("wheel", onWheel, { capture: true });
+      window.removeEventListener("wheel", onWheel, { capture: true });
       window.removeEventListener("keydown", onKeyDown);
     };
   }, [active, contactOpen, pageCount]);
