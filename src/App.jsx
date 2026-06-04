@@ -5,32 +5,7 @@ import Projects from "./components/Projects.jsx";
 import Skills from "./components/Skills.jsx";
 import Experience from "./components/Experience.jsx";
 import HyperOverlay from "./components/HyperOverlay.jsx";
-
-const CONTACT_LINKS = [
-  {
-    label: "Email",
-    value: "your.email@example.com",
-    href: "mailto:your.email@example.com",
-  },
-  {
-    label: "GitHub",
-    value: "github.com/yourname",
-    href: "https://github.com/yourname",
-  },
-  {
-    label: "LinkedIn",
-    value: "linkedin.com/in/yourname",
-    href: "https://www.linkedin.com/in/yourname",
-  },
-];
-
-const PAGES = [
-  { key: "cover", label: "封面", node: <Intro /> },
-  { key: "about", label: "關於我", node: <Hero /> },
-  { key: "projects", label: "作品目錄", node: <Projects /> },
-  { key: "skills", label: "技能", node: <Skills /> },
-  { key: "experience", label: "經歷", node: <Experience /> },
-];
+import { content, contactLinks } from "./data/content.js";
 
 export default function App() {
   const [active, setActive] = useState(0);
@@ -38,9 +13,41 @@ export default function App() {
   const [theme, setTheme] = useState(
     () => localStorage.getItem("theme") || "dark",
   );
+  const [lang, setLang] = useState(() => localStorage.getItem("lang") || "zh");
   const panelInnerRefs = useRef([]);
 
-  const pageCount = PAGES.length;
+  const pages = useMemo(
+    () => [
+      {
+        key: "cover",
+        label: content.pages.cover.label[lang],
+        node: <Intro lang={lang} />,
+      },
+      {
+        key: "about",
+        label: content.pages.about.label[lang],
+        node: <Hero lang={lang} />,
+      },
+      {
+        key: "projects",
+        label: content.pages.projects.label[lang],
+        node: <Projects lang={lang} />,
+      },
+      {
+        key: "skills",
+        label: content.pages.skills.label[lang],
+        node: <Skills lang={lang} />,
+      },
+      {
+        key: "experience",
+        label: content.pages.experience.label[lang],
+        node: <Experience lang={lang} />,
+      },
+    ],
+    [lang],
+  );
+
+  const pageCount = pages.length;
   const progress = useMemo(
     () => (pageCount <= 1 ? 0 : active / (pageCount - 1)),
     [active, pageCount],
@@ -50,6 +57,11 @@ export default function App() {
     document.documentElement.setAttribute("data-theme", theme);
     localStorage.setItem("theme", theme);
   }, [theme]);
+
+  useEffect(() => {
+    document.documentElement.setAttribute("lang", lang);
+    localStorage.setItem("lang", lang);
+  }, [lang]);
 
   useEffect(() => {
     const root = document.documentElement;
@@ -172,9 +184,14 @@ export default function App() {
 
   return (
     <div className={`fullpage-shell${contactOpen ? " is-contact-open" : ""}`}>
-      <HyperOverlay active={active} pages={PAGES} contactOpen={contactOpen} />
+      <HyperOverlay
+        active={active}
+        pages={pages}
+        contactOpen={contactOpen}
+        contactLabel={content.contactModal.title[lang]}
+      />
 
-      <header className="fp-nav" aria-label="作品集分頁導覽">
+      <header className="fp-nav" aria-label={content.nav.pageNavigation[lang]}>
         <button
           className="fp-brand"
           type="button"
@@ -183,10 +200,11 @@ export default function App() {
             setActive(0);
           }}
         >
-          PORTFOLIO<span>.</span>
+          {content.nav.brand}
+          <span>.</span>
         </button>
         <div className="fp-dots" aria-hidden="true">
-          {PAGES.map((page, index) => (
+          {pages.map((page, index) => (
             <button
               key={page.key}
               type="button"
@@ -195,7 +213,7 @@ export default function App() {
                 setContactOpen(false);
                 setActive(index);
               }}
-              aria-label={`前往${page.label}`}
+              aria-label={`${content.nav.goTo[lang]} ${page.label}`}
             >
               <span>{String(index + 1).padStart(2, "0")}</span>
             </button>
@@ -203,15 +221,22 @@ export default function App() {
         </div>
         <button
           className="theme-toggle"
-          aria-label="切換深淺色主題"
+          aria-label={content.nav.themeToggle[lang]}
           onClick={() => setTheme((t) => (t === "dark" ? "light" : "dark"))}
         >
           {theme === "dark" ? "☀️" : "🌙"}
         </button>
+        <button
+          className="theme-toggle"
+          aria-label={content.nav.langToggleAria[lang]}
+          onClick={() => setLang((l) => (l === "zh" ? "en" : "zh"))}
+        >
+          {content.nav.langToggle[lang]}
+        </button>
       </header>
 
       <main className="fp-stage">
-        {PAGES.map((page, index) => (
+        {pages.map((page, index) => (
           <section
             key={page.key}
             className={`snap-panel snap-panel--${page.key}${index === active ? " is-active" : ""}`}
@@ -240,7 +265,7 @@ export default function App() {
       </main>
 
       <aside className="fp-progress" aria-hidden="true">
-        <span>{PAGES[active].label}</span>
+        <span>{pages[active].label}</span>
         <i style={{ transform: `scaleY(${Math.max(0.08, progress)})` }} />
       </aside>
 
@@ -249,36 +274,39 @@ export default function App() {
         role="dialog"
         aria-modal="true"
         aria-hidden={!contactOpen}
-        aria-label="聯絡我"
+        aria-label={content.contactModal.ariaLabel[lang]}
       >
         <button
           className="contact-modal__backdrop"
           type="button"
           onClick={() => setContactOpen(false)}
-          aria-label="關閉聯絡視窗"
+          aria-label={content.contactModal.backdropAria[lang]}
         />
         <div className="contact-modal__panel">
           <button
             className="contact-modal__close"
             type="button"
             onClick={() => setContactOpen(false)}
-            aria-label="關閉"
+            aria-label={content.contactModal.closeAria[lang]}
           >
             ×
           </button>
-          <p className="contact-modal__eyebrow">FINAL NODE // CONTACT</p>
-          <h2>聯絡我</h2>
-          <br />
-          <p className="contact-modal__desc"> </p>
+          <p className="contact-modal__eyebrow">
+            {content.contactModal.eyebrow[lang]}
+          </p>
+          <h2>{content.contactModal.title[lang]}</h2>
+          <p className="contact-modal__desc">
+            {content.contactModal.desc[lang]}
+          </p>
           <div className="contact-links">
-            {CONTACT_LINKS.map((link) => (
+            {contactLinks.map((link) => (
               <a
-                key={link.label}
+                key={link.key}
                 href={link.href}
                 target={link.href.startsWith("http") ? "_blank" : undefined}
                 rel={link.href.startsWith("http") ? "noopener" : undefined}
               >
-                <span>{link.label}</span>
+                <span>{link.label[lang]}</span>
                 <strong>{link.value}</strong>
               </a>
             ))}

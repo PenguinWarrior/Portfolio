@@ -1,6 +1,9 @@
 import { memo } from "react";
+import { content } from "../data/content.js";
 
-function Hero() {
+function Hero({ lang = "zh" }) {
+  const heroCopy = content.hero;
+
   return (
     <section className="cover" id="about">
       {/* 背景裝飾,純視覺 */}
@@ -11,29 +14,23 @@ function Hero() {
       </div>
 
       <div className="container cover__inner reveal">
-        <div className="cover__badge">WAYNE</div>
+        <div className="cover__badge">{heroCopy.badge}</div>
 
-        <p className="cover__eyebrow">PORTFOLIO · 作品集</p>
-        <h1 className="cover__name">王韋程</h1>
-        <p className="cover__role">軟體工程師 · 後端開發 · 數位分身</p>
+        <p className="cover__eyebrow">{heroCopy.eyebrow[lang]}</p>
+        <h1 className="cover__name">{heroCopy.name}</h1>
+        <p className="cover__role">{heroCopy.role[lang]}</p>
 
-        <p className="cover__bio">
-          從高中起投入程式開發，大學主修資訊工程。四年實務經驗橫跨後端與前端 ——
-          系統資料流設計、資料庫架構、REST
-          API、伺服器維運，以及數位分身系統開發。
-        </p>
+        <p className="cover__bio">{heroCopy.bio[lang]}</p>
 
         <ul className="cover__chips">
-          <li>系統資料流設計</li>
-          <li>資料庫架構</li>
-          <li>REST API</li>
-          <li>伺服器維運</li>
-          <li>數位分身</li>
+          {heroCopy.chips.map((item) => (
+            <li key={item[lang]}>{item[lang]}</li>
+          ))}
         </ul>
 
         <div className="cover__actions">
           <a href="#projects" className="btn btn--primary">
-            查看作品
+            {heroCopy.actions.viewProjects[lang]}
           </a>
           <a
             href={`${import.meta.env.BASE_URL}resume.pdf`}
@@ -41,12 +38,16 @@ function Hero() {
             target="_blank"
             rel="noopener"
           >
-            下載履歷
+            {heroCopy.actions.downloadResume[lang]}
           </a>
         </div>
       </div>
 
-      <a href="#projects" className="cover__scroll" aria-label="向下捲動">
+      <a
+        href="#projects"
+        className="cover__scroll"
+        aria-label={heroCopy.scrollAria[lang]}
+      >
         <span />
       </a>
     </section>

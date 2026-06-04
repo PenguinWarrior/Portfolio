@@ -1,6 +1,7 @@
 import { memo } from "react";
+import { content } from "../data/content.js";
 
-function Intro() {
+function Intro({ lang = "zh" }) {
   return (
     <section className="intro" id="intro">
       <div className="intro__bg" aria-hidden="true">
@@ -8,9 +9,13 @@ function Intro() {
         <span className="intro__blob intro__blob--2" />
       </div>
 
-      <h1 className="intro__word">PORTFOLIO</h1>
+      <h1 className="intro__word">{content.nav.brand}</h1>
 
-      <a href="#about" className="intro__scroll" aria-label="向下捲動">
+      <a
+        href="#about"
+        className="intro__scroll"
+        aria-label={content.hero.scrollAria[lang]}
+      >
         <span />
       </a>
     </section>
