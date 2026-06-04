@@ -10,6 +10,7 @@ import { content, contactLinks } from "./data/content.js";
 export default function App() {
   const [active, setActive] = useState(0);
   const [contactOpen, setContactOpen] = useState(false);
+  const [loaded, setLoaded] = useState(false);
   const [theme, setTheme] = useState(
     () => localStorage.getItem("theme") || "dark",
   );
@@ -135,6 +136,17 @@ export default function App() {
     document.documentElement.setAttribute("lang", lang);
     localStorage.setItem("lang", lang);
   }, [lang]);
+
+  useEffect(() => {
+    const onLoaded = () => setLoaded(true);
+    if (document.readyState === "complete") {
+      onLoaded();
+      return;
+    }
+
+    window.addEventListener("load", onLoaded);
+    return () => window.removeEventListener("load", onLoaded);
+  }, []);
 
   useEffect(() => {
     const root = document.documentElement;
@@ -295,6 +307,15 @@ export default function App() {
 
   return (
     <div className={`fullpage-shell${contactOpen ? " is-contact-open" : ""}`}>
+      {!loaded && (
+        <div className="loading-screen">
+          <div className="loader">
+            <div className="inner one" />
+            <div className="inner two" />
+            <div className="inner three" />
+          </div>
+        </div>
+      )}
       <HyperOverlay
         active={active}
         pages={pages}
