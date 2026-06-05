@@ -5,6 +5,7 @@ import Projects from "./components/Projects.jsx";
 import Skills from "./components/Skills.jsx";
 import Experience from "./components/Experience.jsx";
 import HyperOverlay from "./components/HyperOverlay.jsx";
+import MistOverlay from "./components/MistOverlay.jsx";
 import { content, contactLinks } from "./data/content.js";
 
 export default function App() {
@@ -316,6 +317,7 @@ export default function App() {
           </div>
         </div>
       )}
+      <MistOverlay isActive={loaded} />
       <HyperOverlay
         active={active}
         pages={pages}
