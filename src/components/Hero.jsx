@@ -32,14 +32,6 @@ function Hero({ lang = "zh" }) {
           <a href="#projects" className="btn btn--primary">
             {heroCopy.actions.viewProjects[lang]}
           </a>
-          <a
-            href={`${import.meta.env.BASE_URL}resume.pdf`}
-            className="btn btn--ghost"
-            target="_blank"
-            rel="noopener"
-          >
-            {heroCopy.actions.downloadResume[lang]}
-          </a>
         </div>
       </div>
 

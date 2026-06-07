@@ -5,91 +5,19 @@ import Projects from "./components/Projects.jsx";
 import Skills from "./components/Skills.jsx";
 import Experience from "./components/Experience.jsx";
 import HyperOverlay from "./components/HyperOverlay.jsx";
-import MistOverlay from "./components/MistOverlay.jsx";
-import { content, contactLinks } from "./data/content.js";
+import { content } from "./data/content.js";
 
 export default function App() {
   const [active, setActive] = useState(0);
-  const [contactOpen, setContactOpen] = useState(false);
   const [loaded, setLoaded] = useState(false);
   const [theme, setTheme] = useState(
-    () => localStorage.getItem("theme") || "dark",
+    () => localStorage.getItem("theme") || "light",
   );
   const [lang, setLang] = useState(() => localStorage.getItem("lang") || "zh");
   const panelInnerRefs = useRef([]);
-  const audioCtxRef = useRef(null);
-  const lastHoverButtonRef = useRef(null);
 
   const toggleTheme = () => setTheme((t) => (t === "dark" ? "light" : "dark"));
   const toggleLang = () => setLang((l) => (l === "zh" ? "en" : "zh"));
-
-  const getAudioContext = () => {
-    if (audioCtxRef.current) return audioCtxRef.current;
-    const AudioContext = window.AudioContext || window.webkitAudioContext;
-    if (!AudioContext) return null;
-    audioCtxRef.current = new AudioContext();
-    return audioCtxRef.current;
-  };
-
-  const playSound = ({ type, setupFrequency, duration = 0.25 }) => {
-    const audioCtx = getAudioContext();
-    if (!audioCtx) return;
-    if (audioCtx.state === "suspended") audioCtx.resume();
-
-    const osc = audioCtx.createOscillator();
-    const gain = audioCtx.createGain();
-    osc.type = type;
-    osc.connect(gain);
-    gain.connect(audioCtx.destination);
-
-    const now = audioCtx.currentTime;
-    gain.gain.setValueAtTime(0.0001, now);
-    gain.gain.exponentialRampToValueAtTime(0.12, now + 0.01);
-    gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
-
-    setupFrequency(now, osc.frequency);
-
-    osc.start(now);
-    osc.stop(now + duration + 0.02);
-  };
-
-  const playScrollSound = (direction) => {
-    if (direction > 0) {
-      playSound({
-        type: "sine",
-        duration: 0.25,
-        setupFrequency: (now, frequency) => {
-          frequency.setValueAtTime(500, now);
-          frequency.exponentialRampToValueAtTime(90, now + 0.25);
-        },
-      });
-    } else {
-      playSound({
-        // type: "sawtooth",
-        // duration: 0.3,
-        // setupFrequency: (now, frequency) => {
-        //   frequency.setValueAtTime(140, now);
-        //   frequency.exponentialRampToValueAtTime(800, now + 0.3);
-        type: "sine",
-        duration: 0.06,
-        setupFrequency: (now, frequency) => {
-          frequency.setValueAtTime(780, now);
-          frequency.setValueAtTime(1180, now + 0.03);
-        },
-      });
-    }
-  };
-
-  const playButtonHoverSound = () => {
-    playSound({
-      type: "sine",
-      duration: 0.08,
-      setupFrequency: (now, frequency) => {
-        frequency.setValueAtTime(900, now);
-        frequency.setValueAtTime(1400, now + 0.04);
-      },
-    });
-  };
 
   const pages = useMemo(
     () => [
@@ -127,6 +55,13 @@ export default function App() {
     () => (pageCount <= 1 ? 0 : active / (pageCount - 1)),
     [active, pageCount],
   );
+
+  const goToPage = (index) => {
+    const target = Math.min(Math.max(index, 0), pageCount - 1);
+    const panel = panelInnerRefs.current[target];
+    if (panel) panel.scrollTop = 0;
+    setActive(target);
+  };
 
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", theme);
@@ -174,7 +109,7 @@ export default function App() {
     const unlock = () => {
       window.setTimeout(() => {
         locked = false;
-      }, 780);
+      }, 620);
     };
 
     const canScrollInsideActivePanel = (deltaY) => {
@@ -193,32 +128,11 @@ export default function App() {
       return false;
     };
 
-    const goNext = () => {
-      if (contactOpen) return;
-      setActive((current) => {
-        if (current >= pageCount - 1) {
-          setContactOpen(true);
-          return current;
-        }
-        return current + 1;
-      });
-    };
-
-    const goPrev = () => {
-      if (contactOpen) {
-        setContactOpen(false);
-        return;
-      }
-      setActive((current) => Math.max(0, current - 1));
-    };
-
     const onWheel = (event) => {
       if (Math.abs(event.deltaY) < 18) return;
 
       const panel = panelInnerRefs.current[active];
-      const canScroll =
-        !contactOpen && canScrollInsideActivePanel(event.deltaY);
-      if (canScroll && panel) {
+      if (canScrollInsideActivePanel(event.deltaY) && panel) {
         event.preventDefault();
         panel.scrollBy({ top: event.deltaY, left: 0, behavior: "auto" });
         return;
@@ -227,76 +141,50 @@ export default function App() {
       event.preventDefault();
       if (locked) return;
       locked = true;
-      playScrollSound(event.deltaY > 0 ? 1 : -1);
-      event.deltaY > 0 ? goNext() : goPrev();
+      if (event.deltaY > 0) goToPage(active + 1);
+      else goToPage(active - 1);
       unlock();
     };
 
     const onKeyDown = (event) => {
       const nextKeys = ["ArrowDown", "PageDown", " "];
       const prevKeys = ["ArrowUp", "PageUp"];
-      if (
-        ![...nextKeys, ...prevKeys, "Escape", "Home", "End"].includes(event.key)
-      )
-        return;
+      if (![...nextKeys, ...prevKeys, "Home", "End"].includes(event.key)) return;
 
       const direction = nextKeys.includes(event.key) ? 1 : -1;
-      if (!contactOpen && canScrollInsideActivePanel(direction)) return;
+      if (canScrollInsideActivePanel(direction)) return;
 
       event.preventDefault();
-      if (event.key === "Escape") return setContactOpen(false);
-      if (event.key === "Home") {
-        setContactOpen(false);
-        return setActive(0);
-      }
-      if (event.key === "End") {
-        setContactOpen(false);
-        return setActive(pageCount - 1);
-      }
+      if (event.key === "Home") return goToPage(0);
+      if (event.key === "End") return goToPage(pageCount - 1);
       if (locked) return;
       locked = true;
-      nextKeys.includes(event.key) ? goNext() : goPrev();
+      nextKeys.includes(event.key) ? goToPage(active + 1) : goToPage(active - 1);
       unlock();
+    };
+
+    const onAnchorClick = (event) => {
+      const anchor = event.target.closest('a[href^="#"]');
+      if (!anchor) return;
+      const key = anchor.getAttribute("href")?.replace("#", "");
+      const index = pages.findIndex((page) => page.key === key);
+      if (index < 0) return;
+      event.preventDefault();
+      goToPage(index);
     };
 
     document.addEventListener("wheel", onWheel, {
       passive: false,
       capture: true,
     });
-    window.addEventListener("wheel", onWheel, {
-      passive: false,
-      capture: true,
-    });
     window.addEventListener("keydown", onKeyDown);
+    document.addEventListener("click", onAnchorClick);
     return () => {
       document.removeEventListener("wheel", onWheel, { capture: true });
-      window.removeEventListener("wheel", onWheel, { capture: true });
       window.removeEventListener("keydown", onKeyDown);
+      document.removeEventListener("click", onAnchorClick);
     };
-  }, [active, contactOpen, pageCount]);
-
-  useEffect(() => {
-    const onPointerOver = (event) => {
-      const button = event.target.closest("button");
-      if (!button || button === lastHoverButtonRef.current) return;
-      lastHoverButtonRef.current = button;
-      playButtonHoverSound();
-    };
-
-    const onPointerOut = (event) => {
-      const button = event.target.closest("button");
-      if (button && button === lastHoverButtonRef.current) {
-        lastHoverButtonRef.current = null;
-      }
-    };
-
-    document.addEventListener("pointerover", onPointerOver);
-    document.addEventListener("pointerout", onPointerOut);
-    return () => {
-      document.removeEventListener("pointerover", onPointerOver);
-      document.removeEventListener("pointerout", onPointerOut);
-    };
-  }, []);
+  }, [active, pageCount, pages]);
 
   useEffect(() => {
     document.documentElement.style.setProperty("--page-index", active);
@@ -307,7 +195,7 @@ export default function App() {
   }, [active, progress]);
 
   return (
-    <div className={`fullpage-shell${contactOpen ? " is-contact-open" : ""}`}>
+    <div className="fullpage-shell">
       {!loaded && (
         <div className="loading-screen">
           <div className="loader">
@@ -317,12 +205,10 @@ export default function App() {
           </div>
         </div>
       )}
-      <MistOverlay isActive={loaded} />
+
       <HyperOverlay
         active={active}
         pages={pages}
-        contactOpen={contactOpen}
-        contactLabel={content.contactModal.title[lang]}
         theme={theme}
         lang={lang}
         onToggleTheme={toggleTheme}
@@ -333,10 +219,7 @@ export default function App() {
         <button
           className="fp-brand"
           type="button"
-          onClick={() => {
-            setContactOpen(false);
-            setActive(0);
-          }}
+          onClick={() => goToPage(0)}
         >
           {content.nav.brand}
           <span>.</span>
@@ -347,10 +230,7 @@ export default function App() {
               key={page.key}
               type="button"
               className={`fp-dot${index === active ? " is-active" : ""}`}
-              onClick={() => {
-                setContactOpen(false);
-                setActive(index);
-              }}
+              onClick={() => goToPage(index)}
               aria-label={`${content.nav.goTo[lang]} ${page.label}`}
             >
               <span>{String(index + 1).padStart(2, "0")}</span>
@@ -392,51 +272,6 @@ export default function App() {
         <span>{pages[active].label}</span>
         <i style={{ transform: `scaleY(${Math.max(0.08, progress)})` }} />
       </aside>
-
-      <div
-        className="contact-modal"
-        role="dialog"
-        aria-modal="true"
-        aria-hidden={!contactOpen}
-        aria-label={content.contactModal.ariaLabel[lang]}
-      >
-        <button
-          className="contact-modal__backdrop"
-          type="button"
-          onClick={() => setContactOpen(false)}
-          aria-label={content.contactModal.backdropAria[lang]}
-        />
-        <div className="contact-modal__panel">
-          <button
-            className="contact-modal__close"
-            type="button"
-            onClick={() => setContactOpen(false)}
-            aria-label={content.contactModal.closeAria[lang]}
-          >
-            ×
-          </button>
-          <p className="contact-modal__eyebrow">
-            {content.contactModal.eyebrow[lang]}
-          </p>
-          <h2>{content.contactModal.title[lang]}</h2>
-          <p className="contact-modal__desc">
-            {content.contactModal.desc[lang]}
-          </p>
-          <div className="contact-links">
-            {contactLinks.map((link) => (
-              <a
-                key={link.key}
-                href={link.href}
-                target={link.href.startsWith("http") ? "_blank" : undefined}
-                rel={link.href.startsWith("http") ? "noopener" : undefined}
-              >
-                <span>{link.label[lang]}</span>
-                <strong>{link.value}</strong>
-              </a>
-            ))}
-          </div>
-        </div>
-      </div>
     </div>
   );
 }
